@@ -15,7 +15,7 @@ class HelloTest {
 
     @Test
     void ifHelloThenYoSupBro() {
-        var expected = "Yo! Sup bro?!";
+        var expected = "Yo! Wutzuuuup bro?!";
         var actual = sut.hello();
         assertEquals(expected, actual);
     }
