@@ -1,20 +1,34 @@
 package com.bobocode.petros.container;
 
+import com.bobocode.petros.exception.NoDefaultConstructorException;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashSet;
 import java.util.Set;
 
-@SuppressWarnings("all")
+@Slf4j
+@ToString
 public class DependencyDefinition {
     private String name;
     private String qualifiedName;
-    private Set<DependencyDefinition> injectedDependencyDefinitions;
+    private final Set<DependencyDefinition> injectedDependencyDefinitions;
     private static Object dependency;
 
-    @SuppressWarnings("unchecked")
-    public <T> T getDependencyClass() throws Exception {
+    public DependencyDefinition() {
+        injectedDependencyDefinitions = new HashSet<>();
+    }
+
+    public Object getDependencyClass() {
         if (dependency == null) {
-            dependency = (T) Class.forName(qualifiedName).getConstructor().newInstance();
+            try {
+                dependency = Class.forName(qualifiedName).getConstructor().newInstance();
+            } catch (Exception e) {
+                LOG.error("No default constructor found for class {}", qualifiedName);
+                throw new NoDefaultConstructorException(qualifiedName);
+            }
         }
-        return (T) dependency;
+        return dependency;
     }
 
     public String getName() {
