@@ -11,7 +11,7 @@ class AnnotationDependencyClassScannerTest {
 
     @BeforeEach
     void setup() {
-        sut = new AnnotationDependencyClassScanner(SOME_PACKAGE);
+        sut = new AnnotationDependencyClassScanner();
     }
 
     @Test

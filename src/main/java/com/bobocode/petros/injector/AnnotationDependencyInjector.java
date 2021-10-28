@@ -23,11 +23,10 @@ public class AnnotationDependencyInjector implements DependencyInjector {
     }
 
     @Override
-    public ConcurrentHashMap<DependencyDefinition, Object> injectedDependencyDefinitionObjectMap() { //fills dependencyMap
+    public ConcurrentHashMap<DependencyDefinition, Object> injectedDependencyDefinitionObjectMap() {
         var map1 = classScanner.scan(packageName);
         var map2 = configurationScanner.scan(packageName);
-        dependencyMap.put(null,null);
-        return dependencyMap;
+        return null;
     }
 
 
