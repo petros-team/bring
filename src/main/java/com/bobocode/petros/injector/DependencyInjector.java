@@ -2,9 +2,9 @@ package com.bobocode.petros.injector;
 
 import com.bobocode.petros.container.DependencyDefinition;
 
-import java.util.List;
-import java.util.Map;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface DependencyInjector {
-    Map<DependencyDefinition, Object> injectedDependencyDefinitionObjectMap(Map<String, List<DependencyDefinition>> dependenciesMap);
+    ConcurrentHashMap<DependencyDefinition, Object> injectedDependencyDefinitionObjectMap();
 }

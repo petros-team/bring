@@ -7,7 +7,7 @@ import java.util.Map;
 
 @SuppressWarnings("all")
 public class AnnotationDependencyConfigurationScanner implements DependencyScanner {
-    public AnnotationDependencyConfigurationScanner(String packageName) {
+    public AnnotationDependencyConfigurationScanner() {
     }
 
     @Override

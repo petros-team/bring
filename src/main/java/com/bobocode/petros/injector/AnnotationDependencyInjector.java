@@ -5,21 +5,31 @@ import com.bobocode.petros.scaner.AnnotationDependencyClassScanner;
 import com.bobocode.petros.scaner.AnnotationDependencyConfigurationScanner;
 import com.bobocode.petros.scaner.DependencyScanner;
 
-import java.util.List;
-import java.util.Map;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("all")
 public class AnnotationDependencyInjector implements DependencyInjector {
     private final DependencyScanner classScanner;
     private final DependencyScanner configurationScanner;
 
+    private final String packageName;
+    private ConcurrentHashMap<DependencyDefinition, Object> dependencyMap = new ConcurrentHashMap<>();
+
     public AnnotationDependencyInjector(String packageName) {
-        classScanner = new AnnotationDependencyClassScanner(packageName);
-        configurationScanner = new AnnotationDependencyConfigurationScanner(packageName);
+        this.classScanner = new AnnotationDependencyClassScanner();
+        this.configurationScanner = new AnnotationDependencyConfigurationScanner();
+        this.packageName = packageName;
     }
 
     @Override
-    public Map<DependencyDefinition, Object> injectedDependencyDefinitionObjectMap(Map<String, List<DependencyDefinition>> dependenciesMap) {
-        return null;
+    public ConcurrentHashMap<DependencyDefinition, Object> injectedDependencyDefinitionObjectMap() { //fills dependencyMap
+        var map1 = classScanner.scan(packageName);
+        var map2 = configurationScanner.scan(packageName);
+        dependencyMap.put(null,null);
+        return dependencyMap;
     }
+
+
+
 }
