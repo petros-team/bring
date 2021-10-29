@@ -3,12 +3,12 @@ package com.bobocode.petros.container;
 import com.bobocode.petros.injector.AnnotationDependencyInjector;
 import com.bobocode.petros.injector.DependencyInjector;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 @SuppressWarnings("all")
 public class ApplicationAnnotationContainer implements ApplicationContainer {
     private DependencyInjector dependencyInjector;
-    private ConcurrentHashMap<DependencyDefinition,Object> dependencyMap;
+    private Map<DependencyDefinition,Object> dependencyMap;
 
     public ApplicationAnnotationContainer(String packageName) {
         dependencyInjector = new AnnotationDependencyInjector(packageName);
