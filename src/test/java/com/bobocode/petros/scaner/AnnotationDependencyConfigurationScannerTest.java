@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class AnnotationDependencyConfigurationScannerTest {
     private static final String SOME_PACKAGE = "some.package";
@@ -13,7 +12,7 @@ class AnnotationDependencyConfigurationScannerTest {
 
     @BeforeEach
     void setup() {
-        sut = new AnnotationDependencyConfigurationScanner(SOME_PACKAGE);
+        sut = new AnnotationDependencyConfigurationScanner();
     }
 
     @Test

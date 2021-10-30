@@ -6,7 +6,7 @@ import java.util.Set;
 public class DependencyDefinition {
     private String name;
     private String qualifiedName;
-    private Set<String> injectedDependenciesQualifiedName;
+    private Set<DependencyDefinition> injectedDependencyDefinitions;
     private static Object dependency;
 
     @SuppressWarnings("unchecked")
@@ -33,12 +33,12 @@ public class DependencyDefinition {
         this.qualifiedName = qualifiedName;
     }
 
-    public void addInjectedDependencyQualifiedName(String dependencyQualifiedName) {
-        injectedDependenciesQualifiedName.add(dependencyQualifiedName);
+    public void addInjectedDependencyDefinition(DependencyDefinition dependencyQualifiedName) {
+        injectedDependencyDefinitions.add(dependencyQualifiedName);
     }
 
-    public Set<String> getInjectedDependenciesQualifiedName() {
-        return injectedDependenciesQualifiedName;
+    public Set<DependencyDefinition> getDependencyDefinitions() {
+        return injectedDependencyDefinitions;
     }
 
 }

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class AnnotationDependencyInjectorTest {
     private AnnotationDependencyInjector sut;
@@ -16,6 +15,6 @@ class AnnotationDependencyInjectorTest {
 
     @Test
     void injectedDependencyDefinitionObjectMap() {
-        Assertions.assertNull(sut.injectedDependencyDefinitionObjectMap(null));
+        Assertions.assertNull(sut.injectedDependencyDefinitionObjectMap());
     }
 }
