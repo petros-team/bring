@@ -17,12 +17,16 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
 
     @Override
     public <T> T getDependency(String name, Class<T> clazz) {
+        return (T) dependencyMap.values().stream()
+                .filter(obj -> obj.getClass().getName().equals(name) && obj.getClass().equals(clazz))
+                .findFirst();
 
-        return null;
     }
 
     @Override
     public <T> T getDependency(Class<T> clazz) {
-        return null;
+        return (T) dependencyMap.values().stream()
+                .filter(obj ->  obj.getClass().equals(clazz))
+                .findFirst();
     }
 }
