@@ -4,6 +4,7 @@ import com.bobocode.petros.exception.NoUniqueDependecyException;
 import com.bobocode.petros.injector.AnnotationDependencyInjector;
 import com.bobocode.petros.injector.DependencyInjector;
 
+import java.util.Locale;
 import java.util.Map;
 
 @SuppressWarnings("all")
@@ -19,7 +20,8 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
     @Override
     public <T> T getDependency(String name, Class<T> clazz) {
         return (T) dependencyMap.values().stream()
-                .filter(obj -> obj.getClass().getName().equals(name) && obj.getClass().equals(clazz))
+                .filter(obj -> obj.getClass().getName().toLowerCase().equals(name.toLowerCase())
+                        && obj.getClass().equals(clazz))
                 .findFirst();
 
     }
