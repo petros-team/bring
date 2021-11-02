@@ -6,6 +6,7 @@ import com.bobocode.petros.injector.DependencyInjector;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @SuppressWarnings("all")
 public class ApplicationAnnotationContainer implements ApplicationContainer {
@@ -22,7 +23,8 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
         return (T) dependencyMap.values().stream()
                 .filter(obj -> obj.getClass().getName().toLowerCase().equals(name.toLowerCase())
                         && obj.getClass().equals(clazz))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("No such dependency in container"));
 
     }
 
