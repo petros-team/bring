@@ -1,5 +1,6 @@
 package com.bobocode.petros.container;
 
+import com.bobocode.petros.exception.NoUniqueDependecyException;
 import com.bobocode.petros.injector.AnnotationDependencyInjector;
 import com.bobocode.petros.injector.DependencyInjector;
 
@@ -25,6 +26,20 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
 
     @Override
     public <T> T getDependency(Class<T> clazz) {
+        if (!isNonUniqueDependency(clazz)){
+            return getDependencyFromMap(clazz);
+        } else {
+            throw new NoUniqueDependecyException(clazz.getName());
+        }
+    }
+
+    private <T> boolean isNonUniqueDependency(Class<T> clazz){
+        return dependencyMap.values().stream()
+                .filter(obj ->  obj.getClass().equals(clazz))
+                .count() > 1;
+    }
+
+    private <T> T getDependencyFromMap(Class<T> clazz){
         return (T) dependencyMap.values().stream()
                 .filter(obj ->  obj.getClass().equals(clazz))
                 .findFirst();
