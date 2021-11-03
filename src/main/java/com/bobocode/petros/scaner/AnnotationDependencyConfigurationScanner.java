@@ -79,6 +79,7 @@ public class AnnotationDependencyConfigurationScanner implements DependencyScann
         for (Method method : methods) {
             var returnTypeDependencyDefinition = new DependencyDefinition();
             returnTypeDependencyDefinition.setName(getDependencyNameFrom(method));
+            returnTypeDependencyDefinition.setConfigClassDependency(true);
             var returnTypeQualifiedName = method.getReturnType().getName();
             returnTypeDependencyDefinition.setQualifiedName(returnTypeQualifiedName);
             setInjectedDependenciesDefinitionsFromParameters(returnTypeDependencyDefinition, method.getParameters());

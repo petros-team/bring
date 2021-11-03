@@ -10,8 +10,10 @@ import java.util.Set;
 @Slf4j
 @ToString
 public class DependencyDefinition {
+    private boolean configClassDependency;
     private String name;
     private String qualifiedName;
+    private String injectedDependencyMethodName;
     private final Set<DependencyDefinition> injectedDependencyDefinitions;
     private static Object dependency;
 
@@ -31,6 +33,14 @@ public class DependencyDefinition {
         return dependency;
     }
 
+    public boolean isConfigClassDependency() {
+        return configClassDependency;
+    }
+
+    public void setConfigClassDependency(boolean configClassDependency) {
+        this.configClassDependency = configClassDependency;
+    }
+
     public String getName() {
         return name;
     }
@@ -45,6 +55,14 @@ public class DependencyDefinition {
 
     public void setQualifiedName(String qualifiedName) {
         this.qualifiedName = qualifiedName;
+    }
+
+    public String getInjectedDependencyMethodName() {
+        return injectedDependencyMethodName;
+    }
+
+    public void setInjectedDependencyMethodName(String injectedDependencyMethodName) {
+        this.injectedDependencyMethodName = injectedDependencyMethodName;
     }
 
     public void addInjectedDependencyDefinition(DependencyDefinition dependencyQualifiedName) {
