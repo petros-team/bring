@@ -25,8 +25,7 @@ public class AnnotationDependencyInjector implements DependencyInjector {
 
     @Override
     public Map<DependencyDefinition, Object> injectedDependencyDefinitionObjectMap() {
-        //var map1 = classScanner.scan(packageName);
-        //var map2 = configurationScanner.scan(packageName);
+
         return null;
     }
 
