@@ -1,5 +1,6 @@
 package com.bobocode.petros.scaner;
 
+import com.bobocode.petros.container.DependencyDefinition;
 import com.bobocode.petros.exception.NoSuchPackageFoundException;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +49,10 @@ class AnnotationDependencyConfigurationScannerTest {
                 () -> assertEquals("person", personDependencyDefinitionName),
                 () -> assertEquals("com.bobocode.petros.testpackage.scan.config.TestPersonConfigClass$Person", personQualifiedName),
                 () -> assertTrue(personInjectedDependencyDefinitions.stream().anyMatch(d -> d.getName().equals("name"))),
-                () -> assertTrue(personInjectedDependencyDefinitions.stream().anyMatch(d -> d.getName().equals("lastName")))
+                () -> assertTrue(personInjectedDependencyDefinitions.stream().anyMatch(d -> d.getName().equals("lastName"))),
+                () -> assertTrue(stringDependencyDefinitions.stream().allMatch(DependencyDefinition::isConfigClassDependency)),
+                () -> assertTrue(integerDependencyDefinitions.stream().allMatch(DependencyDefinition::isConfigClassDependency)),
+                () -> assertTrue(personDependencyDefinitions.stream().allMatch(DependencyDefinition::isConfigClassDependency))
         );
     }
 
