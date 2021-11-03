@@ -23,9 +23,7 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
         return (T) dependencyMap.values().stream()
                 .filter(obj -> obj.getClass().getName().toLowerCase().equals(name.toLowerCase())
                         && obj.getClass().equals(clazz))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("No such dependency in container"));
-
+                .findFirst();
     }
 
     @Override
