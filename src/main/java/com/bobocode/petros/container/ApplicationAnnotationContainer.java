@@ -9,7 +9,7 @@ import java.util.Map;
 @SuppressWarnings("all")
 public class ApplicationAnnotationContainer implements ApplicationContainer {
     private DependencyInjector dependencyInjector;
-    private Map<DependencyDefinition,Object> dependencyMap;
+    private Map<DependencyDefinition, Object> dependencyMap;
 
     public ApplicationAnnotationContainer(String packageName) {
         dependencyInjector = new AnnotationDependencyInjector(packageName);
