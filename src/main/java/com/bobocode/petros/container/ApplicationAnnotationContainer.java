@@ -4,9 +4,7 @@ import com.bobocode.petros.exception.NoUniqueDependecyException;
 import com.bobocode.petros.injector.AnnotationDependencyInjector;
 import com.bobocode.petros.injector.DependencyInjector;
 
-import java.util.Locale;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 @SuppressWarnings("all")
 public class ApplicationAnnotationContainer implements ApplicationContainer {
