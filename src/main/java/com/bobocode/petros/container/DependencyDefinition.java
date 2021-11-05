@@ -1,6 +1,8 @@
 package com.bobocode.petros.container;
 
 import com.bobocode.petros.exception.NoDefaultConstructorException;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,6 +18,9 @@ public class DependencyDefinition {
     private String injectedDependencyMethodName;
     private final Set<DependencyDefinition> injectedDependencyDefinitions;
     private static Object dependency;
+    @Getter
+    @Setter
+    private String configClassQualifiedName;
 
     public DependencyDefinition() {
         injectedDependencyDefinitions = new HashSet<>();
