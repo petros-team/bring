@@ -1,5 +1,6 @@
 package com.bobocode.petros.container;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,20 +11,19 @@ import java.util.Map;
 
 class ApplicationAnnotationContainerTest {
     private ApplicationAnnotationContainer sut;
-    private Map<String, Object> dependencies = new HashMap<>();
-
+    private Map<DependencyDefinition, Object> dependencies = new HashMap<>();
+    private DependencyDefinition dependencyDefinition;
     @BeforeEach
+    @SneakyThrows
     void setup(){
         sut = new ApplicationAnnotationContainer("some.package");
+        dependencyDefinition = new DependencyDefinition();
+        dependencyDefinition.setName("name");
         Class<? extends ApplicationAnnotationContainer> testContainer = sut.getClass();
-        dependencies.put("name",Object.class);
-        try {
-            Field field = testContainer.getDeclaredField("dependencyMap");
-            field.setAccessible(true);
-            field.set(sut, dependencies);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        dependencies.put(dependencyDefinition, new Object());
+        Field field = testContainer.getDeclaredField("dependencyMap");
+        field.setAccessible(true);
+        field.set(sut, dependencies);
     }
 
     @Test
