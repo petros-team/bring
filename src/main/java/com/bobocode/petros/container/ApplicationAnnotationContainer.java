@@ -5,11 +5,12 @@ import com.bobocode.petros.injector.AnnotationDependencyInjector;
 import com.bobocode.petros.injector.DependencyInjector;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 
-@SuppressWarnings("all")
+
 public class ApplicationAnnotationContainer implements ApplicationContainer {
     private DependencyInjector dependencyInjector;
-    private Map<DependencyDefinition, Object> dependencyMap;
+    private final Map<DependencyDefinition, Object> dependencyMap;
 
     public ApplicationAnnotationContainer(String packageName) {
         dependencyInjector = new AnnotationDependencyInjector(packageName);
@@ -18,25 +19,36 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
 
     @Override
     public <T> T getDependency(String name, Class<T> clazz) {
+        DependencyDefinition definition = keyByDependencyDefinitionName(name);
         return (T) dependencyMap.values().stream()
                 .filter(obj -> obj.getClass().getName().toLowerCase().equals(name.toLowerCase())
                         && obj.getClass().equals(clazz))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
     }
+
 
     @Override
     public <T> T getDependency(Class<T> clazz) {
-        if (!isNonUniqueDependency(clazz)){
+        if (isUniqueDependency(clazz)){
             return getDependencyFromMap(clazz);
         } else {
             throw new NoUniqueDependecyException(clazz.getName());
         }
     }
 
-    private <T> boolean isNonUniqueDependency(Class<T> clazz){
+    private DependencyDefinition keyByDependencyDefinitionName(String name){
+        return dependencyMap.keySet().stream()
+                .filter(dependencyDefinition -> dependencyDefinition.getName().equals(name))
+                .findFirst()
+                .orElseThrow();
+
+    }
+
+    private <T> boolean isUniqueDependency(Class<T> clazz){
         return dependencyMap.values().stream()
                 .filter(obj ->  obj.getClass().equals(clazz))
-                .count() > 1;
+                .count() == 1;
     }
 
     private <T> T getDependencyFromMap(Class<T> clazz){
