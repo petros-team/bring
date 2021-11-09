@@ -49,6 +49,7 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
     private <T> T getDependencyFromMap(Class<T> clazz){
         return (T) dependencyMap.values().stream()
                 .filter(obj ->  obj.getClass().equals(clazz))
-                .findFirst();
+                .findFirst()
+                .orElseThrow();
     }
 }
