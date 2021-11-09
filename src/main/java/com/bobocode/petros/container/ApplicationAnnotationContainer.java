@@ -5,7 +5,6 @@ import com.bobocode.petros.injector.AnnotationDependencyInjector;
 import com.bobocode.petros.injector.DependencyInjector;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 
 public class ApplicationAnnotationContainer implements ApplicationContainer {
@@ -20,20 +19,16 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
     @Override
     public <T> T getDependency(String name, Class<T> clazz) {
         DependencyDefinition definition = keyByDependencyDefinitionName(name);
-        return (T) dependencyMap.values().stream()
-                .filter(obj -> obj.getClass().getName().toLowerCase().equals(name.toLowerCase())
-                        && obj.getClass().equals(clazz))
-                .findFirst()
-                .orElseThrow(NoSuchElementException::new);
+        return (T) dependencyMap.get(definition);
     }
 
 
     @Override
     public <T> T getDependency(Class<T> clazz) {
-        if (isUniqueDependency(clazz)){
-            return getDependencyFromMap(clazz);
-        } else {
+        if (isNonUniqueDependency(clazz)){
             throw new NoUniqueDependecyException(clazz.getName());
+        } else {
+            return getDependencyFromMap(clazz);
         }
     }
 
@@ -45,10 +40,10 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
 
     }
 
-    private <T> boolean isUniqueDependency(Class<T> clazz){
+    private <T> boolean isNonUniqueDependency(Class<T> clazz){
         return dependencyMap.values().stream()
                 .filter(obj ->  obj.getClass().equals(clazz))
-                .count() == 1;
+                .count() > 1;
     }
 
     private <T> T getDependencyFromMap(Class<T> clazz){
