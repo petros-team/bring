@@ -20,10 +20,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toList;
-
 @Slf4j
 public class AnnotationDependencyClassScanner implements DependencyScanner {
     private static final int NUMBER_OF_PARAMETERS_IN_DEFAULT_CONSTRUCTOR = 0;
@@ -42,8 +38,8 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
         LOG.debug("Dependency classes found: [{}]", dependencyClasses);
         var classDependenciesMap = dependencyClasses.stream()
                 .map(this::dependencyDefinitionFrom)
-                .collect(groupingBy(DependencyDefinition::getQualifiedName,
-                        mapping(Function.identity(), toList())));
+                .collect(Collectors.groupingBy(DependencyDefinition::getQualifiedName,
+                        Collectors.mapping(Function.identity(), Collectors.toList())));
         LOG.info("Package {} successfully scanned. Found DependendyDefinitions: [{}]", packageName, classDependenciesMap);
         return classDependenciesMap;
     }
