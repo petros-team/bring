@@ -9,13 +9,17 @@ import java.util.Map;
 
 public class ApplicationAnnotationContainer implements ApplicationContainer {
     private DependencyInjector dependencyInjector;
-    private final Map<DependencyDefinition, Object> dependencyMap;
+    private Map<DependencyDefinition, Object> dependencyMap;
+
+    private ApplicationAnnotationContainer() {
+    }
 
     public ApplicationAnnotationContainer(String packageName) {
         dependencyInjector = new AnnotationDependencyInjector(packageName);
         dependencyMap = dependencyInjector.injectedDependencyDefinitionObjectMap();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getDependency(String name, Class<T> clazz) {
         DependencyDefinition definition = keyByDependencyDefinitionName(name);
@@ -37,7 +41,6 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
                 .filter(dependencyDefinition -> dependencyDefinition.getName().equals(name))
                 .findFirst()
                 .orElseThrow();
-
     }
 
     private <T> boolean isNonUniqueDependency(Class<T> clazz){
@@ -46,6 +49,7 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
                 .count() > 1;
     }
 
+    @SuppressWarnings("unchecked")
     private <T> T getDependencyFromMap(Class<T> clazz){
         return (T) dependencyMap.values().stream()
                 .filter(obj ->  obj.getClass().equals(clazz))
