@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 @Slf4j
 @ToString
@@ -17,7 +18,7 @@ public class DependencyDefinition {
     private String qualifiedName;
     private String injectedDependencyMethodName;
     private final Collection<DependencyDefinition> injectedDependencyDefinitions;
-    private static Object dependency;
+    private Object dependency;
     @Getter
     @Setter
     private String configClassQualifiedName;
@@ -78,4 +79,16 @@ public class DependencyDefinition {
         return injectedDependencyDefinitions;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DependencyDefinition that = (DependencyDefinition) o;
+        return isConfigClassDependency() == that.isConfigClassDependency() && getName().equals(that.getName()) && getQualifiedName().equals(that.getQualifiedName()) && Objects.equals(getInjectedDependencyMethodName(), that.getInjectedDependencyMethodName()) && Objects.equals(injectedDependencyDefinitions, that.injectedDependencyDefinitions) && Objects.equals(dependency, that.dependency) && Objects.equals(getConfigClassQualifiedName(), that.getConfigClassQualifiedName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isConfigClassDependency(), getName(), getQualifiedName(), getInjectedDependencyMethodName(), injectedDependencyDefinitions, dependency, getConfigClassQualifiedName());
+    }
 }
