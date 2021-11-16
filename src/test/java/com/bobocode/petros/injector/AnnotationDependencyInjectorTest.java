@@ -52,6 +52,7 @@ class AnnotationDependencyInjectorTest {
         roomDefinition.setQualifiedName(Room.class.getName());
         roomDefinition.addInjectedDependencyDefinition(wallDefinition);
         roomDefinition.addInjectedDependencyDefinition(stringDefinition);
+        roomDefinition.addInjectedDependencyDefinition(wallDefinition1);
 
         map.put(Room.class.getName(), List.of(roomDefinition));
         map.put(Wall.class.getName(), List.of(wallDefinition1, wallDefinition));

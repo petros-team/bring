@@ -7,13 +7,16 @@ import com.bobocode.petros.exception.DependencyClassNotFoundException;
 import com.bobocode.petros.exception.MultipleInjectConstructorsException;
 import com.bobocode.petros.exception.NoSuchPackageFoundException;
 import com.bobocode.petros.exception.NoSuchPathFoundException;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.bobocode.petros.container.DependencyDefinition;
 
 import java.io.IOException;
+import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import java.util.List;
@@ -84,7 +87,7 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
 
     private Stream<DependencyDefinition> dependencyDefinitionConstructorArgs(Class<?> aClass) {
         return getConstructorsParam(aClass).stream()
-                .filter(this::hasDefaultConstructorByClass)
+                .filter(p->hasDefaultConstructorByClass(p.getType()))
                 .map(this::createInnerDependencyDefinition);
     }
 
@@ -98,16 +101,16 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
         return true;
     }
 
-    private DependencyDefinition createInnerDependencyDefinition(Class<?> aClass) {
+    private DependencyDefinition createInnerDependencyDefinition(Parameter parameter) {
         var definition = new DependencyDefinition();
-        definition.setName(firstCharacterToLowercase(aClass.getSimpleName()));
-        definition.setQualifiedName(aClass.getName());
+        definition.setName(parameter.getName());
+        definition.setQualifiedName(parameter.getType().getName());
         return definition;
     }
 
-    private List<Class<?>> getConstructorsParam(Class<?> aClass) {
+    private List<Parameter> getConstructorsParam(Class<?> aClass) {
         return Arrays.stream(aClass.getDeclaredConstructors())
-                .flatMap(a -> Arrays.stream(a.getParameterTypes()))
+                .flatMap(a -> Arrays.stream(a.getParameters()))
                 .collect(toList());
     }
 
