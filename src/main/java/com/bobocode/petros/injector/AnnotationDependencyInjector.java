@@ -1,14 +1,23 @@
 package com.bobocode.petros.injector;
 
+import com.bobocode.petros.annotation.Injected;
 import com.bobocode.petros.container.DependencyDefinition;
+import com.bobocode.petros.exception.DependencyClassNotFoundException;
 import com.bobocode.petros.exception.InstanceInjectionException;
+import com.bobocode.petros.exception.MultipleInjectConstructorsException;
 import com.bobocode.petros.scaner.AnnotationDependencyClassScanner;
 import com.bobocode.petros.scaner.AnnotationDependencyConfigurationScanner;
 import com.bobocode.petros.scaner.DependencyScanner;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -35,14 +44,16 @@ public class AnnotationDependencyInjector implements DependencyInjector {
 
     @Override
     public Map<DependencyDefinition, Object> injectedDependencyDefinitionObjectMap() {
-//        var map1 = classScanner.scan(packageName);
-        var map2 = configurationScanner.scan(packageName);
-        createConfigClassDependencies(map2);
+        var scannedConfigurationsMap = configurationScanner.scan(packageName);
+        var scannedClassesMap = classScanner.scan(packageName);
+        createConfigClassDependencies(scannedConfigurationsMap);
+        createConfigClassDependencies(scannedClassesMap);
         return dependencyMap;
     }
 
     private void createConfigClassDependencies(Map<String, List<DependencyDefinition>> scannedDependencies) {
-        getDefinitionsSortedByArgsQuantity(scannedDependencies).stream()
+        getDefinitionsSortedByArgsQuantity(scannedDependencies)
+                .stream()
                 .filter(d -> !containsDependencyByName(d.getName()))
                 .forEach(this::injectDependency);
     }
@@ -59,17 +70,66 @@ public class AnnotationDependencyInjector implements DependencyInjector {
     private void injectDependency(DependencyDefinition definition) {
         var injectedDependencies = definition.getDependencyDefinitions();
         if (definition.isConfigClassDependency()) {
-            injectDependency(definition, injectedDependencies);
+            injectConfigDependency(definition, injectedDependencies);
+        } else {
+            injectClassDependency(definition, injectedDependencies);
         }
     }
 
-    private void injectDependency(DependencyDefinition definition,
-                                  Collection<DependencyDefinition> injectedDefinitions) {
+    private void injectConfigDependency(DependencyDefinition definition,
+                                        Collection<DependencyDefinition> injectedDefinitions) {
         if (isReadyToCreateDependency(injectedDefinitions)) {
-            dependencyMap.put(definition, createInjectedInstance(definition));
+            dependencyMap.put(definition, createInjectedConfigInstance(definition));
         } else {
             injectDependency(getAbsentDefinition(injectedDefinitions));
         }
+    }
+
+    private void injectClassDependency(DependencyDefinition definition,
+                                       Collection<DependencyDefinition> injectedDependencies) {
+        if (isReadyToCreateDependency(injectedDependencies)) {
+            dependencyMap.put(definition, createInjectedClassInstance(definition));
+        } else {
+            injectDependency(getAbsentDefinition(injectedDependencies));
+        }
+
+    }
+
+    @SneakyThrows
+    private Object createInjectedClassInstance(DependencyDefinition definition) {
+        Class<?> dependencyClass = getClassForName(definition.getQualifiedName());
+        if (hasConstructorMarkedAsInject(dependencyClass)) {
+            Constructor<?> injectedConstructor = Arrays.stream(dependencyClass.getDeclaredConstructors())
+                    .filter(a -> a.isAnnotationPresent(Injected.class))
+                    .findAny()
+                    .orElseThrow();
+            var construcotrArgs = Arrays.stream(injectedConstructor.getParameters())
+                    .map(parameter -> parameter.getName())
+                    .map(name -> dependencyMap.get(tryToGetDependencyByName(name)))
+                    .toArray();
+            return injectedConstructor.newInstance(construcotrArgs);
+        } else {
+            return dependencyClass.getDeclaredConstructor().newInstance();
+        }
+    }
+
+    private Class<?> getClassForName(String qualifiedName) {
+        try {
+            return Class.forName(qualifiedName);
+        } catch (ClassNotFoundException e) {
+            throw new DependencyClassNotFoundException(e.getMessage(), e);
+        }
+    }
+
+    private boolean hasConstructorMarkedAsInject(Class<?> aClass) {
+        var injectedConstructors = Arrays.stream(aClass.getDeclaredConstructors())
+                .filter(a -> a.isAnnotationPresent(Injected.class))
+                .collect(Collectors.toList());
+        if (injectedConstructors.size() > 1) {
+            LOG.error("Class {} has more that one Injected constructors", aClass.getName());
+            throw new MultipleInjectConstructorsException(aClass.getName());
+        }
+        return !injectedConstructors.isEmpty();
     }
 
     private DependencyDefinition getAbsentDefinition(Collection<DependencyDefinition> injectedDependencies) {
@@ -94,7 +154,7 @@ public class AnnotationDependencyInjector implements DependencyInjector {
                 .anyMatch(d -> name.equals(d.getName()));
     }
 
-    private Object createInjectedInstance(DependencyDefinition dependency) {
+    private Object createInjectedConfigInstance(DependencyDefinition dependency) {
         try {
             String injectedDependencyMethodName = dependency.getInjectedDependencyMethodName();
             Class<?> configClass = Class.forName(dependency.getConfigClassQualifiedName());
