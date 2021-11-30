@@ -6,8 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Slf4j
 @ToString
@@ -16,14 +16,14 @@ public class DependencyDefinition {
     private String name;
     private String qualifiedName;
     private String injectedDependencyMethodName;
-    private final Set<DependencyDefinition> injectedDependencyDefinitions;
+    private final Collection<DependencyDefinition> injectedDependencyDefinitions;
     private static Object dependency;
     @Getter
     @Setter
     private String configClassQualifiedName;
 
     public DependencyDefinition() {
-        injectedDependencyDefinitions = new HashSet<>();
+        injectedDependencyDefinitions = new ArrayList<>();
     }
 
     public Object getDependencyClass() {
@@ -74,7 +74,7 @@ public class DependencyDefinition {
         injectedDependencyDefinitions.add(dependencyQualifiedName);
     }
 
-    public Set<DependencyDefinition> getDependencyDefinitions() {
+    public Collection<DependencyDefinition> getDependencyDefinitions() {
         return injectedDependencyDefinitions;
     }
 

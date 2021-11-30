@@ -6,7 +6,7 @@ import com.bobocode.petros.annotation.Dependency;
 @ConfigClass
 public class TestConfigClass {
     @Dependency
-    public Integer simplestDependency() {
+    public Integer luckyNumber() {
         return 777;
     }
 
