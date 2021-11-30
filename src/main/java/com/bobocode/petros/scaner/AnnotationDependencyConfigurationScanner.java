@@ -12,8 +12,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -95,7 +95,7 @@ public class AnnotationDependencyConfigurationScanner implements DependencyScann
         var returnTypeDependencyDefinition = new DependencyDefinition();
         returnTypeDependencyDefinition.setName(getDependencyNameFrom(method));
         returnTypeDependencyDefinition.setConfigClassDependency(true);
-        returnTypeDependencyDefinition.setInjectedDependencyMethodName(method.getName());
+        returnTypeDependencyDefinition.setConfigDependencyMethodName(method.getName());
         returnTypeDependencyDefinition.setQualifiedName(method.getReturnType().getName());
         returnTypeDependencyDefinition.setConfigClassQualifiedName(entry.getKey());
         setInjectedDependenciesDefinitionsFromParameters(returnTypeDependencyDefinition, method.getParameters());
