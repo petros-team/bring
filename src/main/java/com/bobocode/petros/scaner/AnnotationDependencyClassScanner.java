@@ -31,7 +31,7 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
 
     @Override
     public Map<String, List<DependencyDefinition>> scan(String packageName) {
-        LOG.info("Start scanning of package {} for dependency classes", packageName);
+        LOG.info("Start scanning of package [{}] for dependency classes", packageName);
         var qualifiedNamesFromPackage = listOfQualifiedNamesFromPackage(packageName);
         LOG.debug("Package {} successfully scanned", packageName);
         var dependencyClasses = listOfDependencyClassesFromQualifiedNames(qualifiedNamesFromPackage);
@@ -40,7 +40,7 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
                 .map(this::dependencyDefinitionFrom)
                 .collect(Collectors.groupingBy(DependencyDefinition::getQualifiedName,
                         Collectors.mapping(Function.identity(), Collectors.toList())));
-        LOG.info("Package {} successfully scanned. Found DependendyDefinitions: [{}]", packageName, classDependenciesMap);
+        LOG.info("Package {} successfully scanned. Found DependencyDefinitions: [{}]", packageName, classDependenciesMap);
         return classDependenciesMap;
     }
 
@@ -57,12 +57,13 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
                 .filter(a -> a.isAnnotationPresent(Injected.class))
                 .flatMap(constructor -> Arrays.stream(constructor.getParameters()))
                 .map(this::toInjectedDependencyDefinition)
+                .peek(dependency -> LOG.debug("Injected dependency [{}] for [{}]",dependency.getQualifiedName(),aClass.getName() ))
                 .forEach(dependencyDefinition::addInjectedDependencyDefinition);
     }
 
-
     private DependencyDefinition toInjectedDependencyDefinition(Parameter parameter) {
         var dependencyDefinition = new DependencyDefinition();
+        LOG.debug("Creating Dependency Definition from parameter [{}]",parameter);
         dependencyDefinition.setQualifiedName(parameter.getType().getName());
         dependencyDefinition.setName(parameter.getName());
         return dependencyDefinition;
@@ -125,6 +126,7 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
         try {
             return Class.forName(qualifiedName);
         } catch (ClassNotFoundException e) {
+            LOG.error("Class by {} path not found", qualifiedName);
             throw new DependencyClassNotFoundException(e.getMessage(), e);
         }
     }
