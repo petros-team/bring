@@ -156,7 +156,7 @@ public class AnnotationDependencyInjector implements DependencyInjector {
 
     private Object createInjectedConfigInstance(DependencyDefinition dependency) {
         try {
-            String injectedDependencyMethodName = dependency.getInjectedDependencyMethodName();
+            String injectedDependencyMethodName = dependency.getConfigDependencyMethodName();
             Class<?> configClass = Class.forName(dependency.getConfigClassQualifiedName());
             Class<?>[] argTypes = getDependencyArgTypes(injectedDependencyMethodName, configClass);
             Method declaredMethod = configClass.getDeclaredMethod(injectedDependencyMethodName, argTypes);

@@ -3,21 +3,19 @@ package com.bobocode.petros.container;
 import com.bobocode.petros.exception.NoUniqueDependecyException;
 import com.bobocode.petros.injector.AnnotationDependencyInjector;
 import com.bobocode.petros.injector.DependencyInjector;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
 @Slf4j
+@NoArgsConstructor
 public class ApplicationAnnotationContainer implements ApplicationContainer {
     private DependencyInjector dependencyInjector;
     /**
      * main repository of dependencies instances
      */
     private Map<DependencyDefinition, Object> dependencyMap;
-
-    private ApplicationAnnotationContainer() {
-    }
-
 
     public ApplicationAnnotationContainer(String packageName) {
         LOG.info("Creating instance of dependencyInjector and passing the package name {} for scanning", packageName);
@@ -45,32 +43,31 @@ public class ApplicationAnnotationContainer implements ApplicationContainer {
 
     @Override
     public <T> T getDependency(Class<T> clazz) {
-        if (isNonUniqueDependency(clazz)){
-            LOG.debug("The dependency with such {} type already exists in container",clazz.getName());
-            LOG.info("Please try to use name");
+        if (isNonUniqueDependency(clazz)) {
+            LOG.debug("The dependency with such {} type already exists in container", clazz.getName());
             throw new NoUniqueDependecyException(clazz.getName());
         } else {
             return getDependencyFromMap(clazz);
         }
     }
 
-    private DependencyDefinition keyByDependencyDefinitionName(String name){
+    private DependencyDefinition keyByDependencyDefinitionName(String name) {
         return dependencyMap.keySet().stream()
                 .filter(dependencyDefinition -> dependencyDefinition.getName().equals(name))
                 .findFirst()
                 .orElseThrow();
     }
 
-    private <T> boolean isNonUniqueDependency(Class<T> clazz){
+    private <T> boolean isNonUniqueDependency(Class<T> clazz) {
         return dependencyMap.values().stream()
-                .filter(obj ->  obj.getClass().equals(clazz))
+                .filter(obj -> obj.getClass().equals(clazz))
                 .count() > 1;
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T getDependencyFromMap(Class<T> clazz){
+    private <T> T getDependencyFromMap(Class<T> clazz) {
         return (T) dependencyMap.values().stream()
-                .filter(obj ->  obj.getClass().equals(clazz))
+                .filter(obj -> obj.getClass().equals(clazz))
                 .findFirst()
                 .orElseThrow();
     }
