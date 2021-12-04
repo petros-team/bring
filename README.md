@@ -4,7 +4,7 @@ Bring project is an implementation of the Dependency Injection pattern that is a
 version of the Inversion of Control pattern. Dependency Injection is a technique in which an object
 receives other objects that it depends on, called dependencies.
 
-In Bring we have three main players:
+In Bring we have four main players:
 1. <span style="color:green">_**Dependency**_</span> - classes-components that might be bound between each other inside the **Container**
 2. <span style="color:green">_**Dependency Scanner**_</span> - classes that are responsible for scanning packages to find **Dependencies**
 3. <span style="color:green">_**Injector**_</span> -  internal classes that are responsible for creation and binding **Dependencies** between each other
@@ -26,8 +26,8 @@ public class MyBeautifulDependency{
     
 }
 ```
-In case if your class has other classes as its Dependencies than you should use <span style="color:yellow">@Injected</span> annotation
-on its constructor where these dependencies are passed as a parameters (these parameters also must be marked with <span style="color:yellow">@Dependency</span> annotation)
+In case if your class has other classes as its Dependencies then you should use <span style="color:yellow">@Injected</span> annotation
+on its constructor where these dependencies are passed as parameters (these parameters also must be marked with <span style="color:yellow">@Dependency</span> annotation)
 
 ```java
 import com.bobocode.petros.annotation.Dependency;
@@ -48,7 +48,7 @@ public class MyBeautifulDependency {
     }
 }
 ```
-In cases when you want to use a classes that you don't own in your container and be able to inject them as a Dependencies into your classes
+In cases when you want to use classes that you don't own in your container and be able to inject them as Dependencies into your classes
 then you should provide a proper configuration using <span style="color:yellow">@ConfigClass</span> annotation
 
 ```java
@@ -68,10 +68,10 @@ public class MyBeautifulConfiguration {
     }
 }
 ```
-After this is configuration provided _ForeignDependencyOne_ and _ForeignDependencyTwo_ classes from any other libraries you don't own might be used
-in your project as a **Dependencies** and can be inserted into your own Dependency classes
+After this configuration provided _ForeignDependencyOne_ and _ForeignDependencyTwo_ classes from any other libraries you don't own might be used
+in your project as **Dependencies** and can be inserted into your own Dependency classes
 
-After all configuration is done - the time for creating _**Application Container**_ has come. You just have to create new instance of _**ApplicationAnnotationContainer**_
+After all configurations is done - the time for creating _**Application Container**_ has come. You just have to create new instance of _**ApplicationAnnotationContainer**_
 and pass a string with package name as a parameter. This package and all its sub packages will be scanned and in case of proper configuration
 will be added to the container
 
