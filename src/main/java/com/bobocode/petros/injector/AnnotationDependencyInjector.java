@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -126,7 +127,6 @@ public class AnnotationDependencyInjector implements DependencyInjector {
                 .filter(a -> a.isAnnotationPresent(Injected.class))
                 .collect(Collectors.toList());
         if (injectedConstructors.size() > 1) {
-            LOG.error("Class {} has more that one Injected constructors", aClass.getName());
             throw new MultipleInjectConstructorsException(aClass.getName());
         }
         return !injectedConstructors.isEmpty();
@@ -163,9 +163,9 @@ public class AnnotationDependencyInjector implements DependencyInjector {
             Object[] injectedArgs = getInjectedArgs(dependency);
             Object configInstance = configClass.getConstructor().newInstance();
             return declaredMethod.invoke(configInstance, injectedArgs);
-        } catch (Exception e) {
-            LOG.error("Can't create object from dependency definition", e);
-            throw new InstanceInjectionException();
+        } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException
+                | NoSuchMethodException | InstantiationException e) {
+            throw new InstanceInjectionException(e.getMessage(), e);
         }
     }
 

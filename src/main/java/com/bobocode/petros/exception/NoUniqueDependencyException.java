@@ -1,10 +1,10 @@
 package com.bobocode.petros.exception;
 
-public class NoUniqueDependecyException extends RuntimeException {
+public class NoUniqueDependencyException extends RuntimeException {
     private final String className;
 
-    public NoUniqueDependecyException(String message) {
-        this.className = message;
+    public NoUniqueDependencyException(String className) {
+        this.className = className;
     }
 
     @Override

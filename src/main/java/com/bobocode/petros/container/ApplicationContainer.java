@@ -1,6 +1,6 @@
 package com.bobocode.petros.container;
 
-import com.bobocode.petros.exception.NoUniqueDependecyException;
+import com.bobocode.petros.exception.NoUniqueDependencyException;
 import com.bobocode.petros.injector.DependencyInjector;
 
 /**
@@ -22,7 +22,7 @@ public interface ApplicationContainer {
      */
     <T> T getDependency(String name, Class<T> clazz);
     /**
-     * Method return dependency instance from <b>dependencyMap</b> by name and type. It throws {@link NoUniqueDependecyException} if there is more,
+     * Method return dependency instance from <b>dependencyMap</b> by name and type. It throws {@link NoUniqueDependencyException} if there is more,
      * than one dependency of the specified type
      * @param clazz <b>Class</b>, type of the dependency
      * @return dependency instance

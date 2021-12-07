@@ -84,8 +84,7 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
                     .map(p -> p.substring(0, p.indexOf(".class")))
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            LOG.error("Package name {} doesn't exist. Please check a parameter passed into container", packageName);
-            throw new NoSuchPackageFoundException(packageName);
+            throw new NoSuchPackageFoundException(packageName, e);
         }
     }
 
@@ -105,7 +104,6 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
         var hasDefaultConstructor = Arrays.stream(aClass.getDeclaredConstructors())
                 .anyMatch(a -> a.getParameterCount() == NUMBER_OF_PARAMETERS_IN_DEFAULT_CONSTRUCTOR);
         if (!hasDefaultConstructor) {
-            LOG.error("Class {} doesn't have default constructor", aClass.getName());
             throw new DefaultConstructorNotFoundException(aClass.getName());
         }
         return true;
@@ -116,7 +114,6 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
                 .filter(a -> a.isAnnotationPresent(Injected.class))
                 .count() > 1;
         if (hasMoreOneInjectedConstructor) {
-            LOG.error("Class {} has more that one Injected constructors", aClass.getName());
             throw new MultipleInjectConstructorsException(aClass.getName());
         }
         return true;
@@ -126,7 +123,6 @@ public class AnnotationDependencyClassScanner implements DependencyScanner {
         try {
             return Class.forName(qualifiedName);
         } catch (ClassNotFoundException e) {
-            LOG.error("Class by {} path not found", qualifiedName);
             throw new DependencyClassNotFoundException(e.getMessage(), e);
         }
     }
