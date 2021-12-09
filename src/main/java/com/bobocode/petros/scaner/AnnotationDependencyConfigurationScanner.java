@@ -52,8 +52,7 @@ public class AnnotationDependencyConfigurationScanner implements DependencyScann
                     .map(p -> p.substring(0, p.indexOf(".class")))
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            LOG.error("Package name {} doesn't exist. Please check a parameter passed into container", packageName);
-            throw new NoSuchPackageFoundException(packageName);
+            throw new NoSuchPackageFoundException(packageName, e);
         }
     }
 

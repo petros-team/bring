@@ -1,9 +1,14 @@
 package com.bobocode.petros.exception;
 
 public class NoSuchPackageFoundException extends RuntimeException {
-    private final String packageName;
+    private String packageName;
 
     public NoSuchPackageFoundException(String packageName) {
+        this.packageName = packageName;
+    }
+
+    public NoSuchPackageFoundException(String packageName, Throwable cause) {
+        super(packageName, cause);
         this.packageName = packageName;
     }
 
