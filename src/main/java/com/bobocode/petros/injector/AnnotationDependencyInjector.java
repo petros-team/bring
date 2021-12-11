@@ -47,12 +47,14 @@ public class AnnotationDependencyInjector implements DependencyInjector {
     public Map<DependencyDefinition, Object> injectedDependencyDefinitionObjectMap() {
         var scannedConfigurationsMap = configurationScanner.scan(packageName);
         var scannedClassesMap = classScanner.scan(packageName);
-        createConfigClassDependencies(scannedConfigurationsMap);
-        createConfigClassDependencies(scannedClassesMap);
+        LOG.info("Creating config class dependencies...");
+        createDependencies(scannedConfigurationsMap);
+        LOG.info("Creating dependencies from classes marked as dependency...");
+        createDependencies(scannedClassesMap);
         return dependencyMap;
     }
 
-    private void createConfigClassDependencies(Map<String, List<DependencyDefinition>> scannedDependencies) {
+    private void createDependencies(Map<String, List<DependencyDefinition>> scannedDependencies) {
         getDefinitionsSortedByArgsQuantity(scannedDependencies)
                 .stream()
                 .filter(d -> !containsDependencyByName(d.getName()))
@@ -60,12 +62,12 @@ public class AnnotationDependencyInjector implements DependencyInjector {
     }
 
     private List<DependencyDefinition> getDefinitionsSortedByArgsQuantity(
-            Map<String, List<DependencyDefinition>> scannedDependencies
-    ) {
+            Map<String, List<DependencyDefinition>> scannedDependencies) {
         return scannedDependencies.entrySet().stream()
-                .flatMap(e -> e.getValue().stream())
-                .sorted((d1, d2) -> d1.getDependencyDefinitions().size() - d2.getDependencyDefinitions().size())
-                .collect(Collectors.toList());
+                                  .flatMap(e -> e.getValue().stream())
+                                  .sorted((d1, d2) -> d1.getDependencyDefinitions()
+                                                        .size() - d2.getDependencyDefinitions().size())
+                                  .collect(Collectors.toList());
     }
 
     private void injectDependency(DependencyDefinition definition) {
@@ -99,19 +101,22 @@ public class AnnotationDependencyInjector implements DependencyInjector {
     @SneakyThrows
     private Object createInjectedClassInstance(DependencyDefinition definition) {
         Class<?> dependencyClass = getClassForName(definition.getQualifiedName());
+        Object injectedClassInstance;
         if (hasConstructorMarkedAsInject(dependencyClass)) {
             Constructor<?> injectedConstructor = Arrays.stream(dependencyClass.getDeclaredConstructors())
-                    .filter(a -> a.isAnnotationPresent(Injected.class))
-                    .findAny()
-                    .orElseThrow();
+                                                       .filter(a -> a.isAnnotationPresent(Injected.class))
+                                                       .findAny()
+                                                       .orElseThrow();
             var construcotrArgs = Arrays.stream(injectedConstructor.getParameters())
-                    .map(parameter -> parameter.getName())
-                    .map(name -> dependencyMap.get(tryToGetDependencyByName(name)))
-                    .toArray();
-            return injectedConstructor.newInstance(construcotrArgs);
+                                        .map(parameter -> parameter.getName())
+                                        .map(name -> dependencyMap.get(tryToGetDependencyByName(name)))
+                                        .toArray();
+            injectedClassInstance = injectedConstructor.newInstance(construcotrArgs);
         } else {
-            return dependencyClass.getDeclaredConstructor().newInstance();
+            injectedClassInstance = dependencyClass.getDeclaredConstructor().newInstance();
         }
+        LOG.info("Instance of {} was successfully created", injectedClassInstance.getClass().getName());
+        return injectedClassInstance;
     }
 
     private Class<?> getClassForName(String qualifiedName) {
@@ -124,8 +129,8 @@ public class AnnotationDependencyInjector implements DependencyInjector {
 
     private boolean hasConstructorMarkedAsInject(Class<?> aClass) {
         var injectedConstructors = Arrays.stream(aClass.getDeclaredConstructors())
-                .filter(a -> a.isAnnotationPresent(Injected.class))
-                .collect(Collectors.toList());
+                                         .filter(a -> a.isAnnotationPresent(Injected.class))
+                                         .collect(Collectors.toList());
         if (injectedConstructors.size() > 1) {
             throw new MultipleInjectConstructorsException(aClass.getName());
         }
@@ -134,9 +139,9 @@ public class AnnotationDependencyInjector implements DependencyInjector {
 
     private DependencyDefinition getAbsentDefinition(Collection<DependencyDefinition> injectedDependencies) {
         final DependencyDefinition absentDependency = injectedDependencies.stream()
-                .filter(d -> !containsDependencyByName(d.getName()))
-                .findFirst()
-                .orElseThrow();
+                                                                          .filter(d -> !containsDependencyByName(d.getName()))
+                                                                          .findFirst()
+                                                                          .orElseThrow();
         return absentDependency;
     }
 
@@ -146,12 +151,12 @@ public class AnnotationDependencyInjector implements DependencyInjector {
 
     private boolean containsAllByName(Collection<DependencyDefinition> injectedDependencies) {
         return injectedDependencies.stream()
-                .allMatch(d -> containsDependencyByName(d.getName()));
+                                   .allMatch(d -> containsDependencyByName(d.getName()));
     }
 
     private boolean containsDependencyByName(final String name) {
         return dependencyMap.keySet().stream()
-                .anyMatch(d -> name.equals(d.getName()));
+                            .anyMatch(d -> name.equals(d.getName()));
     }
 
     private Object createInjectedConfigInstance(DependencyDefinition dependency) {
@@ -162,7 +167,9 @@ public class AnnotationDependencyInjector implements DependencyInjector {
             Method declaredMethod = configClass.getDeclaredMethod(injectedDependencyMethodName, argTypes);
             Object[] injectedArgs = getInjectedArgs(dependency);
             Object configInstance = configClass.getConstructor().newInstance();
-            return declaredMethod.invoke(configInstance, injectedArgs);
+            Object instance = declaredMethod.invoke(configInstance, injectedArgs);
+            LOG.info("Instance of {} was successfully created", instance.getClass().getName());
+            return instance;
         } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException
                 | NoSuchMethodException | InstantiationException e) {
             throw new InstanceInjectionException(e.getMessage(), e);
@@ -171,24 +178,24 @@ public class AnnotationDependencyInjector implements DependencyInjector {
 
     private Object[] getInjectedArgs(DependencyDefinition dependency) {
         return dependency.getDependencyDefinitions().stream()
-                .map(obj -> tryToGetDependencyByName(obj.getName()))
-                .map(d -> dependencyMap.get(d))
-                .collect(Collectors.toList())
-                .toArray();
+                         .map(obj -> tryToGetDependencyByName(obj.getName()))
+                         .map(d -> dependencyMap.get(d))
+                         .collect(Collectors.toList())
+                         .toArray();
     }
 
     private DependencyDefinition tryToGetDependencyByName(final String name) {
         return dependencyMap.keySet().stream()
-                .filter(d -> name.equals(d.getName()))
-                .findFirst()
-                .get();
+                            .filter(d -> name.equals(d.getName()))
+                            .findFirst()
+                            .get();
     }
 
     private Class<?>[] getDependencyArgTypes(String injectedDependencyMethodName, Class<?> configClass) {
         return Arrays.stream(configClass.getMethods())
-                .filter(m -> injectedDependencyMethodName.contains(m.getName()))
-                .findFirst()
-                .get()
-                .getParameterTypes();
+                     .filter(m -> injectedDependencyMethodName.contains(m.getName()))
+                     .findFirst()
+                     .get()
+                     .getParameterTypes();
     }
 }
